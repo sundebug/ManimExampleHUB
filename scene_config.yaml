@@ -1,0 +1,39 @@
+camera_config: #照相机
+  background_color: "#222"
+  fps: 60
+  frame_config:
+    frame_shape:
+      - 14.222222222222221
+      - 8.0
+  pixel_height: 1080
+  pixel_width: 1920
+embed_error_sound: false
+embed_exception_mode: Verbose
+end_at_animation_number: null
+file_writer_config:
+  break_into_partial_movies: false
+  file_name: null
+  gamma: 1.0
+  input_file_path: ''
+  movie_file_extension: .mp4
+  open_file_upon_completion: false
+  output_directory: ''
+  pixel_format: yuv420p
+  png_mode: RGB
+  quiet: false
+  saturation: 1.0
+  save_last_frame: false
+  save_pngs: false
+  show_file_location_upon_completion: false
+  video_codec: libx264
+  write_to_movie: false
+leave_progress_bars: false
+presenter_mode: false
+preview: true
+show_animation_progress: false
+skip_animations: false
+start_at_animation_number: null
+window_config:
+  size:
+    - 960
+    - 540
