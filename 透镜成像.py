@@ -2,12 +2,21 @@
 import numpy as np
 from manimlib import *
 from manimlib import SceneState
-from sympy.categories import Object
-
-from RunScene import runScene
 
 
-def cal_w_x(f, u, h=1):
+
+def cal_w_x(f: float, u: float, h: float = 1.0) -> float:
+    """
+    成像公式计算
+    :param f: 焦距
+    :type f:
+    :param u: 物距
+    :type u:
+    :param h: 物体高度
+    :type h:
+    :return: 像距,像高比
+    :rtype:
+    """
     v = 0
     if f == -u:
         v = 7.5
@@ -25,6 +34,15 @@ def cal_w_x(f, u, h=1):
 
 
 def generate_NumberLine(sc: Scene, f: float):
+    """
+    生成光轴
+    :param sc:
+    :type sc:
+    :param f:
+    :type f:
+    :return:
+    :rtype:
+    """
     focus_label = np.array((-2, -1, 0, 1, 2)) * f
     nl = NumberLine(include_ticks=False)
     sc.add(nl)
@@ -212,18 +230,10 @@ class convex_len(Scene):
         self.add(*generateText(text1, u_object, v_object, c_len))
         self.add(c_len.get_convex().set_fill(RED_D, opacity=0.2), light)
         self.add(u_object, v_object)
-        self.state = self.get_state()
-
-    def on_key_press(self, symbol: int, modifiers: int) -> None:
-        print(symbol)
-        if symbol == 32:
-            self.play(
-                self.u_object.animate.shift(RIGHT * 3), run_time=5, rate_func=linear
-            )
-        else:
-            self.restore_state(self.state)
+        self.play( self.u_object.animate.shift(RIGHT * 3), run_time=5, rate_func=linear)
 
 
+# 凹透镜成像动画
 class concave_len(Scene):
     def construct(self):
         f = -1.5
@@ -260,5 +270,87 @@ class concave_len(Scene):
         self.play(u_object.animate.shift(RIGHT * 4), run_time=5, rate_func=linear)
 
 
-if __name__ == "__main__":
-    runScene(convex_len)
+# 平面镜成像
+
+
+class Mirror:
+    def __init__(self, len_center=0, len_height=2, len_focus=100):
+        """
+        :param center: 平面镜在光轴上的位置
+        :param height: 平面镜的高度
+        """
+        self.len_center = len_center
+        self.len_height = len_height
+        self.len_focus = len_focus
+        self.cal = lambda f, u, h: [-u, h]
+        self.mirror_len = Rectangle(width=DEFAULT_DOT_RADIUS, height=self.len_height)
+
+    def get_mirror(self) -> VGroup:
+        return self.mirror_len
+
+    def get_focus(self):
+        return self.len_focus
+
+    def get_c(self):
+        return self.len_center
+
+    def get_h(self):
+        return self.len_height
+
+
+class mirror_len(Scene):
+    def construct(self):
+        u = -3
+        h = 1
+        capital = Tex(
+            r"&平面镜成像,理解为焦距为\infty\\ &v=-u \\& 物像等大",
+            t2c={r"\infty": RED_D},
+        ).align_on_border(LEFT + UP)
+        generate_NumberLine(self, 10)
+        mirror_len = Mirror(len_center=0, len_height=2, len_focus=100)
+        u_object = Object_len(u, h)
+        v_object: Image_len = always_redraw(lambda: Image_len(u_object, mirror_len))
+        light_core = always_redraw(
+            lambda: VGroup(
+                Polyline(
+                    u_object.get_top(),
+                    (mirror_len.get_c(), 0, 0),
+                    u_object.get_top() * (1, -1, 1),
+                ),
+                DashedLine((mirror_len.get_c(), 0, 0), u_object.get_top() * (-1, 1, 1)),
+            ).set_color(GREEN)
+        )
+        light_para = always_redraw(
+            lambda: VGroup(
+                Line(u_object.get_top(), (mirror_len.get_c(), u_object.get_h(), 0)),
+                DashedLine(
+                    (mirror_len.get_c(), u_object.get_h(), 0),
+                    u_object.get_top() * (-1, 1, 1),
+                ),
+            ).set_color(PINK)
+        )
+        light_other = always_redraw(
+            lambda: VGroup(
+                Polyline(
+                    u_object.get_top(),
+                    (mirror_len.get_c(), -u_object.get_h(), 0),
+                    u_object.get_top() * (1, -3, 1),
+                ),
+                DashedLine(
+                    (mirror_len.get_c(), -u_object.get_h(), 0),
+                    u_object.get_top() * (-1, 1, 1),
+                ),
+            ).set_color(YELLOW)
+        )
+
+        self.add(capital)
+        self.add(
+            u_object,
+            v_object,
+            mirror_len.get_mirror(),
+            light_core,
+            light_para,
+            light_other,
+        )
+        self.play(u_object.animate.shift(RIGHT * 2), run_time=5, rate_func=linear)
+
