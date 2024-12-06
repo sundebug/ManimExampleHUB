@@ -1,7 +1,5 @@
 from manimlib import *
 
-from RunScene import runScene
-
 
 class hand2hand(Scene):
 
@@ -82,4 +80,6 @@ class hand2hand(Scene):
 
 
 if __name__ == "__main__":
+	from RunScene import runScene
+
 	runScene(hand2hand)
