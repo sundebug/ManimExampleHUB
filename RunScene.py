@@ -1,61 +1,89 @@
-from yaml import safe_load
-from manimlib import Scene, SceneFileWriter, Mobject, Tex, log
-from manimlib.config import parse_cli, get_configuration, get_custom_config
-from manimlib.extract_scene import get_scene_config
-from manimlib.utils.dict_ops import merge_dicts_recursively
-from typing import Sequence
-from rich import print
+from addict import Dict
+from typing import Sequence, Callable
 
+from glumpy.graphics.svg.shapes import Polygon
+from yaml import unsafe_load, dump
 
-def show_scene_config():
-    args = parse_cli()
-    config = get_configuration(args)
-
-    custom_config = get_custom_config()
-    scene_config = get_scene_config(config)
-    # with open("scene_config.yaml", "w") as f:
-    #     f.write(yaml.dump(scene_config, default_flow_style=False))
-
-    return config, custom_config, scene_config
-
-
-def runScene(scene: Scene.__class__, **kwargs) -> None:
-    yaml_config = {}
-    try:
-        with open("scene_config.yaml") as f:
-            yaml_config = safe_load(f)
-    except FileNotFoundError as e:
-        print("file not find", e)
-    if log.level == log.DEBUG:
-        print(f"debug mode, {yaml_config=},{kwargs=}")
-    yaml_config = merge_dicts_recursively(yaml_config, kwargs)
-    scene(**yaml_config).run()
+from manimlib.config import manim_config
+from manimlib import (
+    Scene,
+    Mobject,
+    Window,
+    Tex,
+    RED_D,
+    BLUE_D,
+    RegularPolygon,
+    ShowCreation,
+)
+import numpy as np
+from manimlib import log, __version__
 
 
 # todo
-def writeScene(scene: Scene.__class__) -> None:
-    yaml_config = {}
-    try:
-        with open("scene_config.yaml") as f:
-            yaml_config = safe_load(f)
-    except FileNotFoundError as e:
-        print("file not find", e)
-    sc: Scene = scene(**yaml_config)
-    sfw = SceneFileWriter(sc, **sc.file_writer_config)
-    sfw.begin()
-    print(sfw.get_movie_file_path())
-    # sfw.open_movie_pipe("sc.mp4")
-    # sfw.begin_animation()
-    # sfw.write_frame(sc.camera)
-    # sfw.close_movie_pipe()
-    # sfw.finish()
+def writeScene(scene: Scene.__class__) -> None: ...
 
 
 def generate_label(
-    labels: Sequence[str] | int,
-    mobjs: Sequence[Mobject],
-    directions: Sequence,
+    labels: Sequence[str] | int, mobjs: Sequence[Mobject], directions=None, **kwargs
 ):
+    if directions is None:
+        directions = []
     if isinstance(labels, int):
-        labels = [chr(i + 65) for i in range(labels)]
-    return [Tex(t).next_to(p, v) for t, p, v in zip(labels, mobjs, directions)]
+
+        labels = [
+            chr(i + 65) for i in range(labels if labels < len(mobjs) else len(mobjs))
+        ]
+    if directions is None:
+        directions = []
+    if len(directions) < len(mobjs):
+        directions = [
+            *directions,
+            *[np.array((0, -1, 0)) for _ in range(len(mobjs) - len(directions))],
+        ]
+    return [
+        Tex(t, **kwargs).next_to(p, v) for t, p, v in zip(labels, mobjs, directions)
+    ]
+
+
+def runScene_new(scene: Scene.__class__, **kwargs) -> None:
+    print(f"ManimGL \033[32mv{__version__}\033[0m")
+    with open("scene_config.yaml", "r") as f:
+        scene_config = unsafe_load(f)
+        scene_config.update(window=Window(**scene_config.pop('window_config')))
+
+    scene(**scene_config).run()
+
+
+def runScene(scene: Callable, **kwargs) -> None:
+
+    print(f"ManimGL \033[32mv{__version__}\033[0m")
+    scene_config = Dict(manim_config.scene)
+    window = Window(**manim_config.window)
+    scene_config.update(window=window)
+    scene(**scene_config).run()
+
+
+def end_tip(func):
+    def wrapper(*args, **kwargs):
+        func(*args, **kwargs)
+        log.info(f"{func.__name__=}运行结束")
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+@end_tip
+class Test(Scene):
+    def construct(self):
+        from manimlib import RegularPolygon, DOWN
+
+        poly = RegularPolygon()
+        labels = generate_label(["A", 'C', 'D', "K"], poly.get_vertices())
+
+        self.play(Tex(R"\to 中k国").animate.shift((2, 0, 0)))
+        self.play(ShowCreation(poly))
+        self.add(*labels)
+
+
+if __name__ == '__main__':
+    runScene(Test, a=2)

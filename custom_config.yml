@@ -1,47 +1,53 @@
 directories:
-  # Set this to true if you want the path to video files
-  # to match the directory structure of the path to the
-  # sourcecode generating that video
   mirror_module_path: False
-  # Where should manim output video and image files?
-  output: "video"
-  # If you want to use images, manim will look to these folders to find them
-  raster_images: "textmp/img"
-  vector_images: "textmp/img"
-  # If you want to use sounds, manim will look here to find it.
-  sounds: "textmp/sound"
-  # Manim often generates tex_files or other kinds of serialized data
-  # to keep from having to generate the same thing too many times.  By
-  # default, these will be stored at tempfile.gettempdir(), e.g. this might
-  # return whatever is at to the TMPDIR environment variable.  If you want to
-  # specify them elsewhere,
-  temporary_storage: "textmp"
-universal_import_line: "from manimlib import *"
-style:
-  tex_template: "ctex"
+  base: "textmp"
+  subdirs:
+    output: "videos"
+    raster_images: "raster_images"
+    vector_images: "vector_images"
+    sounds: "sounds"
+    data: "data"
+    downloads: "downloads"
+  cache: "textmp"
+window:
+  position_string: OO
+  monitor_index: 0
+  full_screen: False
+  size: (1280, 720)  # Specific size, in pixels
+camera:
+  resolution: (1920, 1080)
+  background_color: "#333333"
+  fps: 60
+  background_opacity: 1.0
+file_writer:
+  # 在新版本中去除了
+  # break_into_partial_movies: False
+  ffmpeg_bin: "ffmpeg"
+  video_codec: "libx264"
+  pixel_format: "yuv420p"
+  saturation: 1.0
+  gamma: 1.0
+scene:
+  show_animation_progress: False
+  leave_progress_bars: False
+  default_wait_time: 1.0
+vmobject:
+  default_stroke_width: 4.0
+tex:
+  # See tex_templates.yml
+  template: "ctex"
+  mainfont: "SimSon"
+text:
   font: "Consolas"
-  #font: "wqy-zenhei"
-  text_alignment: "LEFT"
-  background_color: "#000000"
-# Set the position of preview window, you can use directions, e.g. UL/DR/OL/OO/...
-# also, you can also specify the position(pixel) of the upper left corner of
-# the window on the monitor, e.g. "960,540"
-window_position: OO
-window_monitor: 0
-full_screen: False
-# If break_into_partial_movies is set to True, then many small
-# files will be written corresponding to each Scene.play and
-# Scene.wait call, and these files will then be combined
-# to form the full scene.  Sometimes video-editing is made
-# easier when working with the broken up scene, which
-# effectively has cuts at all the places you might want.
-break_into_partial_movies: False
-camera_resolutions:
-  low: "854x480"
-  med: "1280x720"
-  high: "1920x1080"
-  4k: "3840x2160"
-  default_resolution: "high"
-fps: 30
-#embed_exception_mode: "Plain"
-#embed_error_sound: False
+  alignment: "LEFT"
+sizes:
+  frame_height: 8.0
+  small_buff: 0.1
+  med_small_buff: 0.25
+  med_large_buff: 0.5
+  large_buff: 1.0
+  default_mobject_to_edge_buff: 0.5
+  default_mobject_to_mobject_buff: 0.25
+# Can be DEBUG / INFO / WARNING / ERROR / CRITICAL
+log_level: "INFO"
+ignore_manimlib_modules_on_reload: True
