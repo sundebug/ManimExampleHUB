@@ -81,6 +81,7 @@ class DemoRotate(Scene):
             )
         )
 
+        self.wait(2)
 
 if __name__ == '__main__':
     from RunScene import runScene

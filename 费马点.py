@@ -8,8 +8,8 @@ class Fermat(Scene):
 
         pl = Polygon((-2, -1, 0), (2, -1, 0), (1, 3, 0))
         A, B, C = pl.get_vertices()
-        self.p = Dot(fill_color=RED_D)
-        P = self.p.get_center()
+        p = Dot((1, 0, 0), fill_color=RED_D)
+        P = p.get_center()
         label_ABC = VGroup(*generate_label(3, pl.get_vertices(), (LEFT, RIGHT, UP)))
         tri_ACP = always_redraw(
             lambda: Polygon(A, C, P, fill_opacity=0.5, stroke_opacity=0)
@@ -44,10 +44,10 @@ class Fermat(Scene):
             r"+PC = PB + PP' +P'C' \ge BC'",
         ).align_on_border(DOWN)
 
-        self.add_mobjects_among(locals().values())
-
-        self.play(MoveAlongPath(self.p, Circle(radius=0.5).shift(RIGHT)), run_time=5)
-        self.wait(5)
+        self.add(pl, tri_ACP_p, tri_ACP, lines, dots)
+        self.add(label_ABC, label_P, label_P1, label_C1)
+        self.add(CC1, PP1, CP1, AP1, CC1, BC1, AC1, tex_title)
+        # self.play(MoveAlongPath(p, Circle(radius=0.5).shift(RIGHT)), run_time=5)
 
 
 if __name__ == '__main__':

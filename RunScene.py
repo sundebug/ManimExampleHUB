@@ -1,31 +1,52 @@
-from addict import Dict
 from typing import Sequence, Callable
-
-from glumpy.graphics.svg.shapes import Polygon
-from yaml import unsafe_load, dump
-
-from manimlib.config import manim_config
-from manimlib import (
-    Scene,
-    Mobject,
-    Window,
-    Tex,
-    RED_D,
-    BLUE_D,
-    RegularPolygon,
-    ShowCreation,
-)
-import numpy as np
-from manimlib import log, __version__
-
+from manimlib import *
 
 # todo
-def writeScene(scene: Scene.__class__) -> None: ...
+
+# 目前不用的
+# def writeScene(scene: Callable) -> None: ...
+
+# def runScene_new(scene: Callable, **kwargs) -> None:
+#     print(f"ManimGL \033[32mv{__version__}\033[0m")
+#     with open("scene_config.yaml", "r") as f:
+#         scene_config = unsafe_load(f)
+#         scene_config.update(window=Window(**scene_config.pop('window_config')))
+#
+#     scene(**scene_config).run()
+
+
+class Angle(Arc):
+    def __init__(self, v1, v2, v0, **kwargs):
+        self.angle = angle_between_vectors(normalize(v2 - v0), normalize(v1 - v0))
+        self.start_angle = min(
+            abs(angle_of_vector(normalize(v2 - v0))),
+            abs(angle_of_vector(normalize(v1 - v0))),
+        )
+        self.arc_center = v0
+        self.center_v = normalize((v1 + v2) / 2 - v0)
+        super().__init__(
+            start_angle=self.start_angle,
+            angle=self.angle,
+            arc_center=self.arc_center,
+            **kwargs,
+        )
+
+    def get_angle(self):
+        return self.angle * 180 / np.pi
+
+    def add_label(self, label, **kwargs):
+        self.add(
+            Tex(label, font_size=32).next_to(self.get_center(), direction=self.center_v)
+        )
+        return self
 
 
 def generate_label(
-    labels: Sequence[str] | int, mobjs: Sequence[Mobject], directions=None, **kwargs
+    labels: Sequence[str] | int, mobjs: Sequence, directions=None, **kwargs
 ):
+    import numpy as np
+    from manimlib import Tex
+
     if directions is None:
         directions = []
     if isinstance(labels, int):
@@ -45,16 +66,10 @@ def generate_label(
     ]
 
 
-def runScene_new(scene: Scene.__class__, **kwargs) -> None:
-    print(f"ManimGL \033[32mv{__version__}\033[0m")
-    with open("scene_config.yaml", "r") as f:
-        scene_config = unsafe_load(f)
-        scene_config.update(window=Window(**scene_config.pop('window_config')))
-
-    scene(**scene_config).run()
-
-
 def runScene(scene: Callable, **kwargs) -> None:
+    from manimlib import Window, __version__
+    from manimlib.config import manim_config
+    from addict import Dict
 
     print(f"ManimGL \033[32mv{__version__}\033[0m")
     scene_config = Dict(manim_config.scene)
@@ -65,6 +80,7 @@ def runScene(scene: Callable, **kwargs) -> None:
 
 def end_tip(func):
     def wrapper(*args, **kwargs):
+        log.info(f"{func=}开始运行")
         func(*args, **kwargs)
         log.info(f"{func.__name__=}运行结束")
         return func(*args, **kwargs)
@@ -72,18 +88,16 @@ def end_tip(func):
     return wrapper
 
 
-@end_tip
-class Test(Scene):
-    def construct(self):
-        from manimlib import RegularPolygon, DOWN
-
-        poly = RegularPolygon()
-        labels = generate_label(["A", 'C', 'D', "K"], poly.get_vertices())
-
-        self.play(Tex(R"\to 中k国").animate.shift((2, 0, 0)))
-        self.play(ShowCreation(poly))
-        self.add(*labels)
-
-
 if __name__ == '__main__':
-    runScene(Test, a=2)
+    from addict import Dict
+    from manimlib import log, __version__, Scene
+    from manimlib.config import manim_config
+
+    @end_tip
+    class Test(Scene):
+        def construct(self):
+            from manimlib import Circle
+
+            self.add(Circle())
+
+    runScene(Test)

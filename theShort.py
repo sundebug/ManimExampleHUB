@@ -25,9 +25,11 @@ class TheShort(Scene):
         self.add(l1, l2, pa, pb, pc, pk, route, Tk)
         tt = (
             VGroup(
-                Tex(r"将军饮马:", font_size=48, tex_to_color_map={"将军饮马": RED}),
+                Tex(
+                    r"将军饮马:", font_size=48, tex_to_color_map={"将军饮马": RED}
+                ).set_color_by_gradient(RED_D, YELLOW_D),
                 Tex("KA+KB"),
-                Tex("=KA+KC\ge"),
+                Tex(r"=KA+KC\ge"),
                 Tex(r"AC ="),
             )
             .align_on_border(DOWN)

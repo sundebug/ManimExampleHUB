@@ -48,12 +48,12 @@ class Parabola(Scene):
             ax1.get_origin(), aligned_edge=DL
         )
         v_1_y = Vector(
-            (0, d_parabola_fun(0, .8)[1], 0),
+            (0, d_parabola_fun(0, 0.8)[1], 0),
             **Parabola.arrow_config,
             fill_color=YELLOW_D
         ).move_to(ax1.get_origin(), aligned_edge=DOWN)
         v_1_x = Vector(
-            (d_parabola_fun(0, .8)[0], 0, 0),
+            (d_parabola_fun(0, 0.8)[0], 0, 0),
             **Parabola.arrow_config,
             fill_color=YELLOW_D
         ).move_to(ax1.get_origin(), aligned_edge=LEFT)
@@ -90,7 +90,8 @@ class Parabola(Scene):
         ani_tex = AnimationGroup(
             Write(
                 Tex(
-                    R"t& =2 \times  \frac{v_y}{g}\\ h &= \frac{1}{2}v_y t = \frac{v_y^2}{g}  \\ s &= v_x \times t =2 \frac{v_x v_y}{g}\\ &g 为重力加速度",
+                    R"t& =2 \times  \frac{v_y}{g}\\ h &= \frac{1}{2}v_y t = \frac{v_y^2}{g}  \\ s &= v_x \times t =2 "
+                    R"\frac{v_x v_y}{g}\\ &g 为重力加速度",
                     font_size=28,
                 )
                 .align_on_border(RIGHT)
@@ -99,9 +100,10 @@ class Parabola(Scene):
         )
 
         self.play(parabola_ani)
-        self.play(FadeInFromPoint(VGroup(ax1, v_1), ax.get_origin()))
+        self.play(FadeInFromPoint(VGroup(ax1, v_1), ax.get_origin()), run_time=3)
         self.play(ani_group)
         self.play(ani_tex)
+        self.wait(5)
 
 
 if __name__ == '__main__':

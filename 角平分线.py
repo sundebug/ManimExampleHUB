@@ -6,7 +6,7 @@ from RunScene import generate_label
 
 class bisector_angle(Scene):
     def construct(self):
-        angle = 24 * DEGREES
+        angle = 24 * DEG
         A = np.asarray((0, 0, 0))
         B = np.asarray((4, 0, 0))
         D = rotate_vector(B, angle)
@@ -22,9 +22,7 @@ class bisector_angle(Scene):
         ]
         dots = [Dot(p, fill_color=WHITE) for p in [A, B, C, D, E, F, G]]
         dot_labels = generate_label(
-            7,
-            [A, B, C, D, E, F, G],
-            [DOWN, DOWN, UP, RIGHT, DOWN, UL, RIGHT],
+            7, [A, B, C, D, E, F, G], [DOWN, DOWN, UP, RIGHT, DOWN, UL, RIGHT]
         )
         triangles = VGroup(
             Polygon(A, B, D, fill_color=LIGHT_PINK, fill_opacity=0.3, stroke_opacity=0),
